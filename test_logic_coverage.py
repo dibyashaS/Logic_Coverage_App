@@ -506,3 +506,27 @@ def test_racc_tests_satisfy_cacc_requirements():
             assert t[c] is True
             assert f[c] is False
             assert lc._evaluate(t) != lc._evaluate(f)
+
+# Additional Tests
+def test_operator_precedence_and_before_or():
+    lc = LogicCoverage("a | b & c")
+    for row in lc.generate_truth_table():
+        a = row["assignments"]["a"]
+        b = row["assignments"]["b"]
+        c = row["assignments"]["c"]
+        assert row["result"] == (a or (b and c))
+
+
+def test_parentheses_override_precedence():
+    lc = LogicCoverage("(a | b) & c")
+    for row in lc.generate_truth_table():
+        a = row["assignments"]["a"]
+        b = row["assignments"]["b"]
+        c = row["assignments"]["c"]
+        assert row["result"] == ((a or b) and c)
+
+
+def test_double_negation():
+    lc = LogicCoverage("!!a")
+    for row in lc.generate_truth_table():
+        assert row["result"] == row["assignments"]["a"]
